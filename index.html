@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus Memory - Juego de Memoria y Parejas</title>
+  <meta name="description" content="Juego interactivo de memoria con tablero de 4x4 (16 tarjetas), cronómetro, conteo de intentos y efectos visuales de última generación." />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-cosmic">
+  <!-- Fondo con efectos de iluminación ambiental -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Contenedor Principal de la Aplicación -->
+  <div class="app-container">
+
+    <!-- ==============================================
+         1. PANTALLA PRINCIPAL / INICIO
+         ============================================== -->
+    <section id="screen-home" class="screen screen-home active" aria-label="Pantalla de inicio">
+      <div class="home-card glass-panel">
+        <div class="badge-tag">
+          <span class="badge-dot"></span> 16 Tarjetas &bull; 8 Parejas
+        </div>
+
+        <h1 class="game-title">
+          <span class="title-gradient">NEXUS</span>
+          <span class="title-sub">MEMORY</span>
+        </h1>
+        <p class="game-tagline">
+          Pon a prueba tu agilidad mental y memoria espacial en este desafío interactivo 4x4.
+        </p>
+
+        <!-- Selector de Temas -->
+        <div class="theme-selection-box">
+          <label class="section-label">Elige la temática de tus tarjetas:</label>
+          <div class="theme-options">
+            <button type="button" class="theme-btn active" data-theme="cosmic" id="btn-theme-cosmic">
+              <span class="theme-icon">💎</span>
+              <span class="theme-name">Gemas Cósmicas</span>
+            </button>
+            <button type="button" class="theme-btn" data-theme="cyber" id="btn-theme-cyber">
+              <span class="theme-icon">🤖</span>
+              <span class="theme-name">Cyberpunk</span>
+            </button>
+            <button type="button" class="theme-btn" data-theme="nature" id="btn-theme-nature">
+              <span class="theme-icon">🦁</span>
+              <span class="theme-name">Mundo Salvaje</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Estadísticas Rápidas / Récord previo -->
+        <div class="quick-stats-row">
+          <div class="stat-pill">
+            <span class="pill-icon">🏆</span>
+            <div>
+              <span class="pill-label">Mejor Tiempo</span>
+              <strong id="home-best-time">--:--</strong>
+            </div>
+          </div>
+          <div class="stat-pill">
+            <span class="pill-icon">🎯</span>
+            <div>
+              <span class="pill-label">Menor Intentos</span>
+              <strong id="home-best-moves">--</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="action-buttons-group">
+          <button id="btn-start-game" class="btn btn-primary pulse-effect">
+            <span class="btn-icon">▶</span>
+            <span>Jugar Ahora</span>
+          </button>
+          <button id="btn-how-to-play" class="btn btn-secondary">
+            <span class="btn-icon">💡</span>
+            <span>Cómo Jugar</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         2. PANTALLA DEL JUEGO / TABLERO 4x4
+         ============================================== -->
+    <section id="screen-game" class="screen screen-game" aria-label="Pantalla de juego">
+      <!-- Barra superior / Header -->
+      <header class="game-header glass-panel">
+        <div class="header-branding">
+          <button id="btn-back-home" class="btn-icon-round" title="Volver al menú principal" aria-label="Volver al inicio">
+            ←
+          </button>
+          <div class="branding-text">
+            <h2 class="header-title">NEXUS MEMORY</h2>
+            <span class="theme-badge" id="current-theme-badge">Gemas Cósmicas</span>
+          </div>
+        </div>
+
+        <!-- Controles rápidos de sonido y reinicio -->
+        <div class="header-actions">
+          <button id="btn-toggle-sound" class="btn-icon-round" title="Activar/Silenciar sonido" aria-label="Control de sonido">
+            <span id="sound-icon">🔊</span>
+          </button>
+          <button id="btn-restart-header" class="btn btn-restart" title="Reiniciar partida actual">
+            <span class="btn-icon">🔄</span>
+            <span class="restart-text">Reiniciar</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Panel de Estadísticas en Vivo (HUD) -->
+      <div class="game-hud glass-panel">
+        <div class="hud-item" id="hud-timer-box">
+          <div class="hud-icon">⏱️</div>
+          <div class="hud-details">
+            <span class="hud-label">Tiempo</span>
+            <span class="hud-value" id="timer-display">00:00</span>
+          </div>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <div class="hud-item" id="hud-moves-box">
+          <div class="hud-icon">🎯</div>
+          <div class="hud-details">
+            <span class="hud-label">Intentos</span>
+            <span class="hud-value" id="moves-counter">0</span>
+          </div>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <div class="hud-item" id="hud-matches-box">
+          <div class="hud-icon">✨</div>
+          <div class="hud-details">
+            <span class="hud-label">Parejas</span>
+            <span class="hud-value"><span id="matches-counter">0</span> / 8</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Progreso de Parejas Encontradas -->
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+      </div>
+
+      <!-- Contenedor del Tablero 4x4 (16 tarjetas) -->
+      <main class="board-wrapper">
+        <div class="memory-grid" id="memory-grid" role="grid" aria-label="Tablero de memoria de 4 filas y 4 columnas">
+          <!-- Las 16 tarjetas serán inyectadas dinámicamente por app.js -->
+        </div>
+      </main>
+    </section>
+
+    <!-- ==============================================
+         3. MODAL DE VICTORIA / RESULTADO FINAL
+         ============================================== -->
+    <div id="modal-victory" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="victory-title">
+      <div class="modal-card victory-card glass-panel">
+        <!-- Confetti Canvas integrado -->
+        <canvas id="confetti-canvas"></canvas>
+
+        <div class="victory-header">
+          <div class="trophy-wrapper">
+            <span class="trophy-icon">🏆</span>
+            <div class="stars-rating" id="stars-container">
+              <span class="star active">★</span>
+              <span class="star active">★</span>
+              <span class="star active">★</span>
+            </div>
+          </div>
+          <h2 id="victory-title" class="victory-title">¡VICTORIA ÉPICA!</h2>
+          <p class="victory-subtitle" id="victory-message">Has completado el tablero con maestría.</p>
+        </div>
+
+        <!-- Cuadro con desglose de resultados -->
+        <div class="results-summary-grid">
+          <div class="result-tile">
+            <span class="result-icon">⏱️</span>
+            <div class="result-info">
+              <span class="result-label">Tiempo Final</span>
+              <strong class="result-val" id="final-time">00:00</strong>
+            </div>
+          </div>
+
+          <div class="result-tile">
+            <span class="result-icon">🎯</span>
+            <div class="result-info">
+              <span class="result-label">Intentos Realizados</span>
+              <strong class="result-val" id="final-moves">0</strong>
+            </div>
+          </div>
+
+          <div class="result-tile">
+            <span class="result-icon">✨</span>
+            <div class="result-info">
+              <span class="result-label">Parejas Encontradas</span>
+              <strong class="result-val" id="final-matches">8 / 8</strong>
+            </div>
+          </div>
+
+          <div class="result-tile">
+            <span class="result-icon">⚡</span>
+            <div class="result-info">
+              <span class="result-label">Precisión</span>
+              <strong class="result-val" id="final-accuracy">100%</strong>
+            </div>
+          </div>
+        </div>
+
+        <div id="new-record-banner" class="new-record-banner hidden">
+          <span>🌟 ¡Nuevo Récord Personal! 🌟</span>
+        </div>
+
+        <!-- Acciones del Modal -->
+        <div class="modal-actions">
+          <button id="btn-play-again" class="btn btn-primary pulse-effect">
+            <span class="btn-icon">🔄</span>
+            <span>Jugar de Nuevo</span>
+          </button>
+          <button id="btn-victory-home" class="btn btn-secondary">
+            <span class="btn-icon">🏠</span>
+            <span>Menú Principal</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         4. MODAL DE CÓMO JUGAR / INSTRUCCIONES
+         ============================================== -->
+    <div id="modal-instructions" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
+      <div class="modal-card instructions-card glass-panel">
+        <div class="modal-close-row">
+          <button id="btn-close-instructions" class="btn-icon-round" aria-label="Cerrar ventana">✕</button>
+        </div>
+        <h2 id="instructions-title" class="instructions-title">Reglas del Juego</h2>
+        
+        <ul class="rules-list">
+          <li>
+            <div class="rule-num">1</div>
+            <div class="rule-content">
+              <strong>Elige dos tarjetas:</strong> En cada turno haz clic sobre 2 tarjetas para descubrir sus símbolos.
+            </div>
+          </li>
+          <li>
+            <div class="rule-num">2</div>
+            <div class="rule-content">
+              <strong>Si coinciden:</strong> Las tarjetas permanecerán visibles y se sumará una pareja a tu marcador.
+            </div>
+          </li>
+          <li>
+            <div class="rule-num">3</div>
+            <div class="rule-content">
+              <strong>Si no coinciden:</strong> Se ocultarán automáticamente después de un breve momento para que puedas memorizarlas.
+            </div>
+          </li>
+          <li>
+            <div class="rule-num">4</div>
+            <div class="rule-content">
+              <strong>Protección de turno:</strong> No podrás seleccionar más tarjetas mientras dos tarjetas se estén ocultando, ni tampoco tarjetas ya resueltas.
+            </div>
+          </li>
+          <li>
+            <div class="rule-num">5</div>
+            <div class="rule-content">
+              <strong>Victoria:</strong> ¡Encuentra las 8 parejas en el menor tiempo y con la menor cantidad de intentos posible!
+            </div>
+          </li>
+        </ul>
+
+        <button id="btn-got-it" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">
+          ¡Entendido, a jugar!
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Script principal del juego -->
+  <script src="app.js"></script>
+</body>
+</html>
